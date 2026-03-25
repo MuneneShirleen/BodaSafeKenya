@@ -1,0 +1,144 @@
+<!-- templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BodaSafe Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f8;
+        }
+        .navbar {
+            background-color: #007bff;
+        }
+        .navbar-brand, .nav-link, .logout-btn {
+            color: #fff !important;
+        }
+        .logout-btn:hover {
+            color: #ffc107 !important;
+        }
+        .table-hover tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .search-bar {
+            margin-bottom: 15px;
+        }
+        .card-summary {
+            margin-bottom: 20px;
+        }
+        .badge-status {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">BodaSafe Admin</a>
+    <div class="d-flex">
+      <span class="navbar-text me-3">
+        Welcome, {{ username }}
+      </span>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-light logout-btn">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+
+    <!-- Summary Cards -->
+    <div class="row card-summary">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Riders</h5>
+                    <p class="card-text">{{ total_riders }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Online Riders</h5>
+                    <p class="card-text">{{ online_riders }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary">
+                <div class="card-body">
+                    <h5 class="card-title">Inactive Riders</h5>
+                    <p class="card-text">{{ inactive_riders }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="mb-4">Riders List</h2>
+
+    <!-- Search bar -->
+    <input type="text" id="searchInput" class="form-control search-bar" placeholder="Search riders by name...">
+
+    <table class="table table-striped table-hover">
+        <thead class="table-primary">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Motorcycle Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="ridersTable">
+            {% for rider in riders %}
+            <tr>
+                <td>{{ rider[0] }}</td>
+                <td>{{ rider[1] }}</td>
+                <td>{{ rider[2] }}</td>
+                <td>{{ rider[3] }}</td>
+                <td>
+                    {% if rider[4] == 'Active' %}
+                        <span class="badge bg-success badge-status">Active</span>
+                    {% elif rider[4] == 'On-Duty' %}
+                        <span class="badge bg-warning text-dark badge-status">On-Duty</span>
+                    {% else %}
+                        <span class="badge bg-secondary badge-status">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('edit_rider', rider_id=rider[0]) }}" class="btn btn-sm btn-info">Edit</a>
+                    <a href="{{ url_for('delete_rider', rider_id=rider[0]) }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Bootstrap JS + Search Filter Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Simple client-side search
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('#ridersTable tr');
+
+    searchInput.addEventListener('keyup', () => {
+        const query = searchInput.value.toLowerCase();
+        tableRows.forEach(row => {
+            const name = row.cells[1].textContent.toLowerCase();
+            row.style.display = name.includes(query) ? '' : 'none';
+        });
+    });
+</script>
+
+</body>
+</html>
